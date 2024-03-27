@@ -16,9 +16,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.var;
 import shop.mihalen.model.Account;
+import shop.mihalen.model.AccountRegister;
 import shop.mihalen.model.LoginRequest;
 import shop.mihalen.model.LoginResponse;
 import shop.mihalen.security.JwtIssuer;
@@ -40,12 +44,9 @@ public class AuthController {
       BCryptPasswordEncoder pe = new BCryptPasswordEncoder();
         System.out.println(pe.encode(request.getPassword()));
        return authService.attempLogin(request.getUsername(),request.getPassword());
-      // var token = jwtIssuer.issue(1L, "name", "emai", List.of("user"));
-      // return LoginResponse.builder().assessToken(token).build();
     }
     @PostMapping("/auth/register")
-    public ResponseEntity<Account> saveAccount(@RequestBody @Validated Account account){
-      // return new ResponseEntity<>(account,HttpStatus.OK);
-      return accountService.saveAccount(account);
+    public ResponseEntity<Account> saveAccount(@RequestBody @Validated AccountRegister accountRegister){
+      return ResponseEntity.ok(accountService.saveAccount(accountRegister));
     }
 }

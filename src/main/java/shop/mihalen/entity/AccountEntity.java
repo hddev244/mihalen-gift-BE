@@ -1,7 +1,11 @@
 package shop.mihalen.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -26,12 +30,12 @@ public class AccountEntity implements Serializable {
       @Id
       @GeneratedValue(strategy = GenerationType.AUTO)
       private Long id;
-      @Column(nullable = false, unique = true)
+      @Column(nullable = false, unique = true,updatable = false)
       private String username;
       @Nonnull
       private String password;
       private String fullname;
-      @Column(nullable = false, unique = true)
+      @Column(nullable = false, unique = true,updatable = false)
       private String email;
       private String photo;
       private String address;
@@ -50,4 +54,12 @@ public class AccountEntity implements Serializable {
       @JsonManagedReference
       @OneToMany(mappedBy = "account")
       private List<RoleOfAccount> roleOfAccounts;
+
+      @CreationTimestamp
+      @Column(name = "createDate", updatable = false)
+      private Date createDate;
+
+      @UpdateTimestamp
+      @Column(name = "modifiDate")
+      private Date modifiDate;
 }

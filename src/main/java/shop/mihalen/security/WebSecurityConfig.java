@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+    private final PasswordEncoder passwordEncoder;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailService customUserDetailService;
     private final UnauthorizedHandler unauthorizedHandler;
@@ -35,28 +36,25 @@ public class WebSecurityConfig {
                         .authenticationEntryPoint(unauthorizedHandler))
                 .securityMatcher("/**") // cấu hình đường dẫn cần bảo vệ
                 .authorizeRequests(registry -> registry
-                                .requestMatchers("/").permitAll()
-                                .requestMatchers("/auth/login").permitAll()
                                 .requestMatchers(
-                                    "/auth/register",
-                                    "/api/account/**",
-                                    "/api/accounts/**"
-                                    ).permitAll()
-                                .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+                                        "/",
+                                        "/auth/register",
+                                        "/auth/login"
+                                        ).permitAll()
+                                .requestMatchers(
+                                        "/api/admin/**"
+                                        ).hasAnyRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
             ;
         return http.build();
     }
-    @Bean
-    public PasswordEncoder encoder(){
-        return new BCryptPasswordEncoder();
-    }
+
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .userDetailsService(customUserDetailService)
-                .passwordEncoder(encoder())
+                .passwordEncoder(passwordEncoder)
                 .and().build();
     }
 }
