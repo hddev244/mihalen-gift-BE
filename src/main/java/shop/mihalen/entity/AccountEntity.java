@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "Accounts")
 public class AccountEntity implements Serializable {
       @Id
-      @GeneratedValue(strategy = GenerationType.AUTO)
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
       private Long id;
       @Column(nullable = false, unique = true,updatable = false)
       private String username;

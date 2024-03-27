@@ -23,6 +23,7 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailService customUserDetailService;
     private final UnauthorizedHandler unauthorizedHandler;
+    
     @SuppressWarnings("deprecation")
     @Bean
     public SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {

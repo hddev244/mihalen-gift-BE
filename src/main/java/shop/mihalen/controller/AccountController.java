@@ -53,7 +53,7 @@ public class AccountController {
             @RequestParam("index") Optional<Integer> index,
             @RequestParam("size") Optional<Integer> size) {
         return ResponseEntity.ok(
-                accountService.findPageAccounts(index.orElse(10), index.orElse(0)));
+                accountService.findPageAccounts(size.orElse(10), index.orElse(0)));
     }
 
     @GetMapping("/api/account/{username}")

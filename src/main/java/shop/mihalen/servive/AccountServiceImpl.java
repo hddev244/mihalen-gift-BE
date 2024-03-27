@@ -1,5 +1,6 @@
 package shop.mihalen.servive;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.mihalen.entity.AccountEntity;
+import shop.mihalen.entity.Role;
 import shop.mihalen.entity.RoleOfAccount;
+import shop.mihalen.enums.ROLE;
 import shop.mihalen.model.Account;
 import shop.mihalen.model.AccountRegister;
 import shop.mihalen.repository.AccountRepository;
@@ -30,7 +33,8 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepository accountRepository; 
     private final PasswordEncoder pe;
-    private final JwtUtils jwtUtils;
+    private final RoleOfAccountService roleOfAccountService;
+    private final RoleService roleService;
 
 
     @Override
@@ -41,12 +45,22 @@ public class AccountServiceImpl implements AccountService {
         } else {
             AccountEntity accountEntity = new AccountEntity();
             BeanUtils.copyProperties(accountRegister, accountEntity);
-            System.out.println(accountEntity.getPassword());
+            
             accountEntity.setPassword(pe.encode(accountEntity.getPassword()));
-            accountRepository.save(accountEntity);
-            Account account = new Account();
-            BeanUtils.copyProperties(accountEntity, account);
-            return account;
+
+            
+
+            //save an account
+            accountEntity = accountRepository.save(accountEntity);
+
+            // add role Customer to accout registion
+            Role role = roleService.findById(ROLE.ROLE_CUSTOMER.toString());
+
+            RoleOfAccount roleOfAccount = roleOfAccountService.saveOneRole(accountEntity,role);
+            accountEntity.setRoleOfAccounts(List.of(roleOfAccount));
+            System.out.println(accountEntity.getRoleOfAccounts().size());
+
+            return copyEntityToAccount(accountEntity);
         }
     }
 
@@ -127,6 +141,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public void invalidateToken(String token) {
-        jwtUtils.invalidateToken(token);
+        // jwtUtils.invalidateToken(token);
     }
 }
