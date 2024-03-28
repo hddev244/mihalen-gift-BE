@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.mihalen.entity.AccountEntity;
-import shop.mihalen.entity.Role;
+import shop.mihalen.entity.RoleEntity;
 import shop.mihalen.entity.RoleOfAccount;
 import shop.mihalen.repository.AccountRepository;
 import shop.mihalen.repository.RoleOfAccountRepository;
@@ -19,7 +19,7 @@ public class RoleOfAccountServiceImpl implements RoleOfAccountService {
     private final RoleRepository roleRepository;
     private final AccountRepository accountRepository;
     @Override
-    public RoleOfAccount saveOneRole(AccountEntity accountEntity, Role role) {
+    public RoleOfAccount saveOneRole(AccountEntity accountEntity, RoleEntity role) {
         RoleOfAccount roleOfAccount = new RoleOfAccount();
         roleOfAccount.setAccount(accountEntity);
         roleOfAccount.setRole(role);
@@ -28,7 +28,7 @@ public class RoleOfAccountServiceImpl implements RoleOfAccountService {
 
     @Override
     public void addRole(String username, String roleId) {
-        Optional<Role> role = roleRepository.findById(roleId);
+        Optional<RoleEntity> role = roleRepository.findById(roleId);
         Optional<AccountEntity> accountEntity = accountRepository.findByUsernameLike(username);
         if(role.isPresent() && accountEntity.isPresent()){
             saveOneRole(accountEntity.get(), role.get());

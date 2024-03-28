@@ -14,7 +14,7 @@ import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import shop.mihalen.entity.Role;
+import shop.mihalen.entity.RoleEntity;
 
 @Data
 @NoArgsConstructor
@@ -32,7 +32,7 @@ public class Account {
     private String phoneNumber;
     private boolean activated;
     private boolean locked;
-    private List<Role> roles = new ArrayList();
+    private List<RoleEntity> roles = new ArrayList();
     private Date createDate;
     private Date modifiDate;
 }

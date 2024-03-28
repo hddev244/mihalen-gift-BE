@@ -1,7 +1,12 @@
 package shop.mihalen.servive;
 
-import shop.mihalen.entity.Role;
+import java.util.List;
+
+import shop.mihalen.entity.RoleEntity;
+import shop.mihalen.model.Role;
 
 public interface RoleService {
     Role findById(String roleId);
+
+    List<Role> findAll();
 }

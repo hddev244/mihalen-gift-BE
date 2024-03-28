@@ -18,12 +18,13 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import shop.mihalen.entity.AccountEntity;
-import shop.mihalen.entity.Role;
+import shop.mihalen.entity.RoleEntity;
 import shop.mihalen.entity.RoleOfAccount;
 import shop.mihalen.enums.ROLE;
 import shop.mihalen.model.Account;
 import shop.mihalen.model.AccountRegister;
 import shop.mihalen.repository.AccountRepository;
+import shop.mihalen.repository.RoleRepository;
 import shop.mihalen.security.ChangePasswordRequest;
 import shop.mihalen.security.JwtUtils;
 
@@ -34,8 +35,17 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository; 
     private final PasswordEncoder pe;
     private final RoleOfAccountService roleOfAccountService;
-    private final RoleService roleService;
+    private final RoleRepository repository;
 
+
+    private Account copyEntityToAccount(AccountEntity accountEntity) {
+        Account account = new Account();
+        BeanUtils.copyProperties(accountEntity, account);
+        accountEntity.getRoleOfAccounts().stream()
+                .map(RoleOfAccount::getRole)
+                .forEach(account.getRoles()::add);
+        return account;
+    }
 
     @Override
     public Account saveAccount(AccountRegister accountRegister) {
@@ -54,11 +64,10 @@ public class AccountServiceImpl implements AccountService {
             accountEntity = accountRepository.save(accountEntity);
 
             // add role Customer to accout registion
-            Role role = roleService.findById(ROLE.ROLE_CUSTOMER.toString());
+            RoleEntity role = repository.findById(ROLE.ROLE_CUSTOMER.toString()).get();
 
             RoleOfAccount roleOfAccount = roleOfAccountService.saveOneRole(accountEntity,role);
             accountEntity.setRoleOfAccounts(List.of(roleOfAccount));
-            System.out.println(accountEntity.getRoleOfAccounts().size());
 
             return copyEntityToAccount(accountEntity);
         }
@@ -110,15 +119,6 @@ public class AccountServiceImpl implements AccountService {
         return copyEntityToAccount(accountEntity);
     }
 
-    private Account copyEntityToAccount(AccountEntity accountEntity) {
-        Account account = new Account();
-        BeanUtils.copyProperties(accountEntity, account);
-        accountEntity.getRoleOfAccounts().stream()
-                .map(RoleOfAccount::getRole)
-                .forEach(account.getRoles()::add);
-        return account;
-    }
-
     @Override
     public void changePassword(Authentication authentication, ChangePasswordRequest request) {
         var username = authentication.getName();
@@ -143,4 +143,6 @@ public class AccountServiceImpl implements AccountService {
     public void invalidateToken(String token) {
         // jwtUtils.invalidateToken(token);
     }
+
+    
 }

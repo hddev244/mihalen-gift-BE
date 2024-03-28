@@ -30,5 +30,5 @@ public class RoleOfAccount {
     AccountEntity account;
     @ManyToOne
     @JoinColumn(name = "role_id")
-    Role role;
+    RoleEntity role;
 }

@@ -10,7 +10,7 @@ import jakarta.annotation.Nonnull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import shop.mihalen.entity.Role;
+import shop.mihalen.entity.RoleEntity;
 
 @Data
 @NoArgsConstructor
@@ -26,5 +26,5 @@ public class AccountRegister {
     private String email;
     private String address;
     private String phoneNumber;
-    private List<Role> roles = new ArrayList();
+    private List<RoleEntity> roles = new ArrayList();
 }

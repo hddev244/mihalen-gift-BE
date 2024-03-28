@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Entity
 @Table(name="roles")
-public class Role {
+public class RoleEntity {
     @Id
     private String id;
     private String name;
