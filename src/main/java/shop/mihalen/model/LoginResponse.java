@@ -6,5 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class LoginResponse {
-    private final String assessToken;
+    private final String accessToken;
+    private final Account account;
 }

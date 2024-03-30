@@ -1,24 +1,18 @@
 package shop.mihalen.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
-import lombok.var;
-import shop.mihalen.entity.AccountEntity;
 import shop.mihalen.model.Account;
-import shop.mihalen.security.AccountPrincipal;
 import shop.mihalen.security.ChangePasswordRequest;
-import shop.mihalen.security.JwtUtils;
 import shop.mihalen.servive.AccountService;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,17 +20,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequiredArgsConstructor
+// @CrossOrigin(origins = "http://localhost:3000")
 public class AccountController {
     @Autowired
     AccountService accountService;
@@ -44,8 +38,8 @@ public class AccountController {
     ObjectMapper mapper;
 
     @GetMapping("/api/admin/accounts")
-    List<Account> getAllAccounts() {
-        return accountService.findAllAccounts();
+    ResponseEntity<List<Account>> getAllAccounts() {
+        return ResponseEntity.ok(accountService.findAllAccounts());
     }
 
     @GetMapping("/api/admin/accounts/pages")
