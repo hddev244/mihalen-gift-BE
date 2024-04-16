@@ -136,6 +136,21 @@ public class ProductServiceImpl implements ProductService{
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Image removed successfully");
         return ResponseEntity.ok(response);
+    }
+    @Override
+    public ResponseEntity<?> findByCategory(String id, int index, int size) {
+        System.out.println("Category id: "+id);
+        System.out.println("Index: "+index);
+        System.out.println("Size: "+size);
+        Map<String, Object> response = new HashMap<>();
+        Pageable pageable = PageRequest.of(index, size);
+         Page<ProductEntity> products = productRepository.findByCategory(id, pageable);
+
+        if(products.isEmpty()){
+            response.put("message", "No products found");
+            return ResponseEntity.badRequest().body(response);
+        }
+        response.put("data", products);
+        return ResponseEntity.ok(response);
     }  
-    
 }

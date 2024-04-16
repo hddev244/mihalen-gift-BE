@@ -53,7 +53,7 @@ public class AccountEntity implements Serializable {
       @OneToMany(mappedBy = "account")
       private List<Order> orders;
 
-      @OneToMany(mappedBy = "account",cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
+      @OneToMany(mappedBy = "account",cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval = true)
       @OnDelete(action = OnDeleteAction.CASCADE)
       private List<CartItem> cartItems;
       

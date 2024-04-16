@@ -1,6 +1,7 @@
 package shop.mihalen.entity;
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,12 +26,12 @@ public class CartItem {
       @GeneratedValue(strategy = GenerationType.IDENTITY)
       private Long id;
 
-      @ManyToOne(fetch = FetchType.LAZY)
+      @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
       @JoinColumn(name = "account_id", referencedColumnName = "id")
       private AccountEntity account;
       
-      @OneToOne(fetch = FetchType.EAGER)
-      @JoinColumn(name = "productId", referencedColumnName = "id")
+      @ManyToOne(fetch = FetchType.EAGER)
+      @JoinColumn(name = "product_id", referencedColumnName = "id")
       private ProductEntity product;
 
       @DecimalMin(value="1")

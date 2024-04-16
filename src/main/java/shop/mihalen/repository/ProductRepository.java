@@ -55,4 +55,18 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>{
                 " FROM ProductEntity p WHERE p.id = :id"
                 )
     Optional<ProductDTO> findByIdDTO(Long id);
+
+    @Query("SELECT new shop.mihalen.dto.ProductDTO("+
+                " p.id"+
+                 ", p.name"+
+                ", p.price"+
+                ", p.description"+
+                 ", new shop.mihalen.dto.CategoryDTO(p.category.id,p.category.name)"+
+                ", new shop.mihalen.dto.ImagesDTO(p.thumbnail.id,p.thumbnail.name)" +
+                ", p.createDate"+
+                  ", p.modifiDate "+
+                ") " +
+                " FROM ProductEntity p WHERE p.category.id = :id"
+                )
+    Page<ProductEntity> findByCategory(String id, Pageable pageable);
 }

@@ -16,4 +16,5 @@ public interface ProductService {
     Optional<ProductEntity> findById(Long id);
     ResponseEntity<?> findByIdResponseEntity(Long id);
     ResponseEntity<?> removeImage(Long id, Long imageId);
+    ResponseEntity<?> findByCategory(String id, int index, int size);
 }

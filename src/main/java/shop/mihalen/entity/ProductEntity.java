@@ -50,7 +50,7 @@ public class ProductEntity implements Serializable {
       private Boolean genderSpecific;
       private String description;
 
-      @ManyToOne
+      @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
       @JoinColumn(name = "category_id",referencedColumnName = "id")
       private CategoryEntity category;
 
@@ -58,7 +58,7 @@ public class ProductEntity implements Serializable {
       @OneToMany(mappedBy = "product")
       private List<OrderDetail> orderDetails = new ArrayList<OrderDetail>();
       
-      @ManyToMany(cascade = CascadeType.ALL)
+      @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
       @JoinTable(name = "product_images", 
                   joinColumns = {
                         @JoinColumn(name = "product_id")
@@ -69,7 +69,7 @@ public class ProductEntity implements Serializable {
                   )
       private Set<ImageModel> images;
 
-      @OneToOne(cascade = CascadeType.ALL)
+      @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
       @JoinTable(name = "product_thumbnail", 
                   joinColumns = {
                         @JoinColumn(name = "product_id")
@@ -80,9 +80,8 @@ public class ProductEntity implements Serializable {
                   )
       private ImageModel thumbnail;
 
-      @OneToOne(mappedBy = "product",fetch = FetchType.LAZY)
-      @JoinColumn(name = "cartItem_id", referencedColumnName = "id")
-      private CartItem cartItem;
+      @OneToMany(mappedBy = "product",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+      private Set<CartItem> cartItem;
 
       @CreationTimestamp
       @Column(name = "createDate", updatable = false)

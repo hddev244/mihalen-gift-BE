@@ -40,7 +40,7 @@ public class CategoryEntity  implements Serializable {
       private ImageModel thumbnail;
 
       @JsonIgnore
-      @OneToMany(mappedBy = "category")
+      @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
       private List<ProductEntity> products;
 
       public CategoryEntity(String id, String name) {

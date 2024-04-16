@@ -43,6 +43,11 @@ public class ProductController {
         return productService.findByIdResponseEntity(id);
     }
 
+    @GetMapping("/category/{id}")
+    public ResponseEntity<?> findByCategory(@PathVariable String id, @RequestParam("index") Optional<Integer> index, @RequestParam("size") Optional<Integer> size){
+        return productService.findByCategory(id, index.orElse(0), size.orElse(10));
+    }
+
     @GetMapping("/pages")
     public ResponseEntity<?> findPages(@RequestParam("index") int index, @RequestParam("size") int size){
         return productService.findPagesDTO(index, size);
