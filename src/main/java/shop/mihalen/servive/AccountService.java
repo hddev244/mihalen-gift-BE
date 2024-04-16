@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
 import shop.mihalen.entity.AccountEntity;
@@ -19,4 +20,7 @@ public interface AccountService  {
     Page<Account> findPageAccounts(int size,int index);
     Account updateAccount(String username, Account account);
     void changePassword(Authentication authentication, ChangePasswordRequest request);
+    ResponseEntity<?> deleteAccount(Long id);
+    ResponseEntity<?> lockAccount(Long id);
+    ResponseEntity<?> createAccount(Account account);
 }

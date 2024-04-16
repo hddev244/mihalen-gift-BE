@@ -22,13 +22,11 @@ public class OrderDetail  implements Serializable  {
       private Long id;
       private Double price;
       private Integer quantity;
-
-      @JsonBackReference
+     
       @ManyToOne
       @JoinColumn(name = "ProductId")
-      private Product product;
+      private ProductEntity product;
       
-      @JsonBackReference
       @ManyToOne
       @JoinColumn(name = "orderId",referencedColumnName = "id")
       private Order order;

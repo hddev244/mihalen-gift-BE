@@ -44,6 +44,12 @@ public class WebSecurityConfig {
                                         )
                                         .permitAll()
                                         // .hasAnyRole("ADMIN")
+                                .requestMatchers(
+                                        "/**")
+                                        .permitAll()
+                                .requestMatchers(
+                                        "/api/admin/categories/**"
+                                        ).permitAll()
                                 .anyRequest().authenticated()
                 )
             ;

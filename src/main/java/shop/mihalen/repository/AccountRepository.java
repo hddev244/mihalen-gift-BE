@@ -9,4 +9,5 @@ import shop.mihalen.entity.AccountEntity;
 public interface AccountRepository extends JpaRepository<AccountEntity,Long> {
     
     Optional<AccountEntity> findByUsernameLike(String username);
+    Optional<AccountEntity> findByEmailLike(String email);
 }

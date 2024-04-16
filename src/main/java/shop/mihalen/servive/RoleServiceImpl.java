@@ -56,4 +56,15 @@ public class RoleServiceImpl implements RoleService {
 
         throw new IllegalStateException("Wrong roleID");
     }
+
+    @Override
+    public Role addNewRole(Role role) {
+        RoleEntity roleEntity = new RoleEntity();
+        BeanUtils.copyProperties(role, roleEntity);
+        roleEntity = repository.save(roleEntity);
+        return Role.builder()
+                .id(roleEntity.getId())
+                .name(roleEntity.getName())
+                .build();
+    }
 }

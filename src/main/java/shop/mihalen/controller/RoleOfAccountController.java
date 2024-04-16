@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import shop.mihalen.model.RoleAccountRequest;
 import shop.mihalen.servive.RoleOfAccountService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,19 +19,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class RoleOfAccountController {
     private final RoleOfAccountService roleOfAccountService;
     @PostMapping
-    public String addRole(@RequestBody RoleAccountRequest request) {
+    public ResponseEntity<?> addChangeRole(@RequestBody RoleAccountRequest request) {
         String username = request.getUsername();
         String roleId = request.getRoleId();
-        roleOfAccountService.addRole(username,roleId);
-        return "s";
+        return roleOfAccountService.changeRole(username,roleId);
     }
 
     @DeleteMapping
-    public String removeRole(@RequestBody RoleAccountRequest request) {
-        Long accountId = request.getAccountId();
+    public ResponseEntity<?> removeRole(@RequestBody RoleAccountRequest request) {
         String roleId = request.getRoleId();
-        roleOfAccountService.removeRole(accountId,roleId);
-        return "s";
+        String username = request.getUsername();
+        return roleOfAccountService.removeRole(username,roleId);
     }
-    
 }

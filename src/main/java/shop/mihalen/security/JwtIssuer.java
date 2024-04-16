@@ -11,6 +11,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import lombok.RequiredArgsConstructor;
+import shop.mihalen.properties.JwtProperties;
 
 
 @Component
@@ -26,6 +27,5 @@ public class JwtIssuer {
         .withClaim("r", roles)
         .withClaim("i", userId)
         .sign(Algorithm.HMAC256(properties.getSecretKey())); //chứ kí , mã private
-        // .sign(Algorithm.HMAC256("secrect")); //chứ kí , mã private
     }
 }

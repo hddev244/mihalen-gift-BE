@@ -8,5 +8,4 @@ import lombok.RequiredArgsConstructor;
 public class RoleAccountRequest {
     private final String roleId;
     private final String username;
-    private final Long accountId;
 }

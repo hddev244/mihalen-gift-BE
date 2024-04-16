@@ -5,17 +5,23 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +41,7 @@ public class AccountEntity implements Serializable {
       @Nonnull
       private String password;
       private String fullname;
-      @Column(nullable = false, unique = true,updatable = false)
+      @Column(nullable = false, unique = true)
       private String email;
       private String photo;
       private String address;
@@ -47,12 +53,14 @@ public class AccountEntity implements Serializable {
       @OneToMany(mappedBy = "account")
       private List<Order> orders;
 
-      @JsonManagedReference
-      @OneToMany(mappedBy = "account")
+      @OneToMany(mappedBy = "account",cascade = CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true)
+      @OnDelete(action = OnDeleteAction.CASCADE)
       private List<CartItem> cartItems;
+      
 
       @JsonManagedReference
-      @OneToMany(mappedBy = "account")
+      @OneToMany(mappedBy = "account",cascade = CascadeType.ALL, orphanRemoval = true)
+      @OnDelete(action = OnDeleteAction.CASCADE)
       private List<RoleOfAccount> roleOfAccounts;
 
       @CreationTimestamp
@@ -62,4 +70,5 @@ public class AccountEntity implements Serializable {
       @UpdateTimestamp
       @Column(name = "modifiDate")
       private Date modifiDate;
+      
 }
