@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.mihalen.entity.ImageModel;
 import shop.mihalen.entity.ProductEntity;
+import shop.mihalen.repository.ImageRepository;
 import shop.mihalen.servive.ProductService;
 
 @RestController
@@ -32,6 +33,8 @@ import shop.mihalen.servive.ProductService;
 public class ProductController {
     @Autowired
     ProductService productService;
+    @Autowired
+    ImageRepository imageRepository;
 
     @GetMapping
     public ResponseEntity<?> findAll(){
@@ -66,15 +69,20 @@ public class ProductController {
         try{
             ObjectMapper mapper = new ObjectMapper();
             ProductEntity product = mapper.readValue(productString, ProductEntity.class);
+            System.out.println(product.getName() + " " + product.getPrice() + " " + product.getDescription() + " " + product.getCategory());
             Set<ImageModel> images = uploadImage(files);
-            
+
+            // imageRepository.saveAll(images);
+
             product.setImages(images);
+
             product.setThumbnail(images.iterator().next());
             return productService.addNewProduct(product);
         }catch(Exception e){
             System.out.println(e.getMessage());
-            return ResponseEntity.badRequest().body("Error: "+e.getMessage());
+            // return ResponseEntity.badRequest().body("Error: "+e.getMessage());
         }
+        return null;
     }
     @PutMapping(value = "/{id}")
     public ResponseEntity<?> update(

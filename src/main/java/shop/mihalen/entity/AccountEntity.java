@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.annotation.Nonnull;
@@ -53,13 +54,13 @@ public class AccountEntity implements Serializable {
       @OneToMany(mappedBy = "account")
       private List<Order> orders;
 
-      @OneToMany(mappedBy = "account",cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval = true)
+      @OneToMany(mappedBy = "account",fetch = FetchType.LAZY, orphanRemoval = true)
       @OnDelete(action = OnDeleteAction.CASCADE)
       private List<CartItem> cartItems;
       
 
-      @JsonManagedReference
-      @OneToMany(mappedBy = "account",cascade = CascadeType.ALL, orphanRemoval = true)
+      @JsonIgnore
+      @OneToMany(mappedBy = "account", orphanRemoval = true)
       @OnDelete(action = OnDeleteAction.CASCADE)
       private List<RoleOfAccount> roleOfAccounts;
 

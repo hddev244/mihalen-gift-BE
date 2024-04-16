@@ -18,4 +18,13 @@ public class OrderDTO {
     private Set<CartItemDTO> cartItems;
     private Double totalPrice;
     private Date orderDate;
+
+    public OrderDTO(Long id, String name, String address, String phoneNumber, Double totalPrice, Date orderDate) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.totalPrice = totalPrice;
+        this.orderDate = orderDate;
+    }
 }

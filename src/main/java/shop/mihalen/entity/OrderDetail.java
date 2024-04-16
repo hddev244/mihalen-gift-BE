@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,7 +29,7 @@ public class OrderDetail  implements Serializable  {
       @JoinColumn(name = "ProductId")
       private ProductEntity product;
       
-      @ManyToOne
+      @ManyToOne(fetch = FetchType.LAZY)
       @JoinColumn(name = "orderId",referencedColumnName = "id")
       private Order order;
 }

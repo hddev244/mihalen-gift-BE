@@ -11,13 +11,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.mihalen.model.OrderRequest;
 import shop.mihalen.servive.OrderService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
     @Autowired
     private OrderService orderService;
-    
+
+@GetMapping()
+public ResponseEntity<?> getMethodName() {
+    return orderService.getAllOrdersOfCustomer();
+}
     @PostMapping("/add")
     public ResponseEntity<?> addOrder(@RequestBody OrderRequest orderRequest){
         return orderService.addOrder(orderRequest);

@@ -25,7 +25,6 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ResponseEntity<?> addNewProduct(ProductEntity product) {
-        
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setId(product.getCategory().getId());
         product.setCategory(categoryEntity);

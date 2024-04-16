@@ -22,6 +22,7 @@ import shop.mihalen.entity.OrderDetail;
 import shop.mihalen.model.OrderRequest;
 import shop.mihalen.repository.AccountRepository;
 import shop.mihalen.repository.CartItemRepository;
+import shop.mihalen.repository.OrderDetailRepository;
 import shop.mihalen.repository.OrderRepository;
 import shop.mihalen.security.AccountPrincipal;
 import shop.mihalen.security.JwtUtils;
@@ -30,6 +31,8 @@ import shop.mihalen.security.JwtUtils;
 public class OrderServiceImpl implements OrderService{
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
     @Autowired
     private HttpServletRequest request;
     @Autowired
@@ -47,29 +50,27 @@ public class OrderServiceImpl implements OrderService{
         AccountEntity account = getAccountFromRequest(request);
         if (account != null) {
             List<OrderDetail> orderDetails = new ArrayList<>();
-
-            for (Long cartItemId : orderRequest.getCartItemID()) {
-                cartItemRepository.findById(cartItemId).ifPresent(cartItem -> {
-                    System.out.println(cartItem.getProduct().getName());
-                    OrderDetail orderDetail = new OrderDetail();
-                    orderDetail.setProduct(cartItem.getProduct());
-                    orderDetail.setQuantity(cartItem.getQuantity());
-                    orderDetail.setPrice(cartItem.getProduct().getPrice());
-                    orderDetails.add(orderDetail);
-
-                    cartItemRepository.delete(cartItem);
-                });
-            }
-
-            if (orderDetails.size() > 0) {
+            if (orderRequest.getCartItemID().size() > 0) {
                 Order order = new Order();
                 order.setAccount(account);
                 order.setOrderDetails(orderDetails);
                 order.setName(orderRequest.getName());
                 order.setAddress(orderRequest.getAddress());
-                order.setPhoneNumber(orderRequest.getPhoneNumber());
-
                 order = orderRepository.save(order);
+                final Order finalOrder = order;
+                for (Long cartItemId : orderRequest.getCartItemID()) {
+                    cartItemRepository.findById(cartItemId).ifPresent(cartItem -> {
+                        OrderDetail orderDetail = new OrderDetail();
+                        orderDetail.setOrder(finalOrder);
+                        orderDetail.setProduct(cartItem.getProduct());
+                        orderDetail.setQuantity(cartItem.getQuantity());
+                        orderDetail.setPrice(cartItem.getProduct().getPrice());
+                        orderDetails.add(orderDetail);             
+                    });
+                    cartItemRepository.deleteById(cartItemId);
+                }
+
+                
 
                 OrderDTO orderDTO = new OrderDTO();
                 orderDTO.setId(order.getId());
@@ -77,6 +78,8 @@ public class OrderServiceImpl implements OrderService{
                 orderDTO.setAddress(order.getAddress());
                 orderDTO.setPhoneNumber(order.getPhoneNumber());
                 orderDTO.setOrderDate(order.getCreateDate());
+
+               
                 
                 Set<CartItemDTO> cartItems = new HashSet<>();
                 orderDetails.forEach(orderDetail -> {
@@ -118,5 +121,55 @@ public class OrderServiceImpl implements OrderService{
             return accountRepository.findByUsernameLike(username).orElse(null);
         }
         return null;
+    }
+
+    @Override
+    public ResponseEntity<?> getAllOrdersOfCustomer() {
+        AccountEntity account = getAccountFromRequest(request);
+        Map<String, Object> response = new HashMap<>();
+
+        if (account != null) {
+            List<Order> orders = orderRepository.findByAccount(account);
+            List<OrderDTO> orderDTOs = new ArrayList<>();
+            orders.forEach(order -> {
+                OrderDTO orderDTO = new OrderDTO();
+                orderDTO.setId(order.getId());
+                orderDTO.setName(order.getName());
+                orderDTO.setAddress(order.getAddress());
+                orderDTO.setPhoneNumber(order.getPhoneNumber());
+                orderDTO.setOrderDate(order.getCreateDate());
+
+                List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(order);
+
+                System.out.println(orderDetails.size() + " order details");
+
+                Set<CartItemDTO> cartItems = new HashSet<>();
+                order.getOrderDetails().forEach(orderDetail -> {
+                    CartItemDTO cartItemDTO = new CartItemDTO();
+
+                    ProductDTO productDTO = new ProductDTO();
+                    productDTO.setId(orderDetail.getProduct().getId());
+                    productDTO.setName(orderDetail.getProduct().getName());
+                    productDTO.setPrice(orderDetail.getProduct().getPrice());
+
+                    cartItemDTO.setProduct(productDTO);
+                    cartItemDTO.setQuantity(orderDetail.getQuantity());
+              
+                    cartItems.add(cartItemDTO);
+                });
+
+                orderDTO.setCartItems(cartItems);
+                orderDTO.setTotalPrice(order.getOrderDetails().stream().mapToDouble(orderDetail -> orderDetail.getPrice() * orderDetail.getQuantity()).sum());
+
+                orderDTOs.add(orderDTO);
+            });
+            response.put("data", orderDTOs);
+            return ResponseEntity.ok(response);
+        }else {
+           
+            response.put("message", "Account not found in request. Please login again.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
     }
 }

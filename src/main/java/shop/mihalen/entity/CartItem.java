@@ -26,7 +26,7 @@ public class CartItem {
       @GeneratedValue(strategy = GenerationType.IDENTITY)
       private Long id;
 
-      @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+      @ManyToOne(fetch = FetchType.EAGER)
       @JoinColumn(name = "account_id", referencedColumnName = "id")
       private AccountEntity account;
       
