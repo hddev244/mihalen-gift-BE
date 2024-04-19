@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequiredArgsConstructor
-// @CrossOrigin(origins = "http://localhost:3000")
 public class AccountController {
     @Autowired
     AccountService accountService;
@@ -57,11 +56,6 @@ public class AccountController {
         AccountPrincipal accountPrincipal = jwtUtils.getAccountPrincipalFromToken(request);
         return ResponseEntity.ok(
                 accountService.findPageAccounts(size.orElse(10), index.orElse(0)));
-    }
-
-    @GetMapping("/api/account/{username}")
-    Account getAccount(@PathVariable("username") String username) {
-        return accountService.findByUsername(username).get();
     }
 
     @GetMapping("/api/admin/account/{username}")

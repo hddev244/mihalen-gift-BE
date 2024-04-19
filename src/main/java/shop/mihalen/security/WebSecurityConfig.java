@@ -1,5 +1,6 @@
 package shop.mihalen.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,12 +15,15 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class WebSecurityConfig {
-    private final PasswordEncoder passwordEncoder;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserDetailService customUserDetailService;
-    private final UnauthorizedHandler unauthorizedHandler;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private CustomUserDetailService customUserDetailService;
+    @Autowired
+    private UnauthorizedHandler unauthorizedHandler;
     
     @SuppressWarnings("deprecation")
     @Bean

@@ -58,6 +58,7 @@ public class ProductEntity implements Serializable {
       @OneToMany(mappedBy = "product")
       private List<OrderDetail> orderDetails = new ArrayList<OrderDetail>();
       
+      @JsonIgnore
       @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
       @JoinTable(name = "product_images", 
                   joinColumns = {
@@ -79,7 +80,8 @@ public class ProductEntity implements Serializable {
                   }
                   )
       private ImageModel thumbnail;
-
+      
+      @JsonIgnore
       @OneToMany(mappedBy = "product",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
       private Set<CartItem> cartItem;
 

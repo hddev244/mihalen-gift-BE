@@ -11,11 +11,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import jakarta.servlet.http.HttpServletRequest;
 import shop.mihalen.dto.CartItemDTO;
+import shop.mihalen.dto.CategoryDTO;
 import shop.mihalen.dto.ImagesDTO;
 import shop.mihalen.dto.ProductDTO;
 import shop.mihalen.entity.AccountEntity;
@@ -46,65 +48,63 @@ public class CartItemServiceImpl implements CartItemService {
         Map<String, Object> response = new HashMap<>();
 
         AccountEntity accountExisting = getAccountFromRequest(request);
-        if (accountExisting != null) {
-            Optional<ProductDTO> productDTO = productRepository.findByIdDTO(productId);
-            if (productDTO.isPresent()) {
-                CartItemDTO cartItemDTO = new CartItemDTO();
-                ProductDTO productExisting = productDTO.get();
 
-                CartItemDTO cartItemExisting = cartItemRepository
-                        .findByProductAndAccount(productExisting.getId(), accountExisting.getUsername())
-                        .orElse(null);
-
-                // if product already exists in cart, increase quantity
-                if (cartItemExisting != null) {
-                    cartItemExisting.setQuantity(quantity + cartItemExisting.getQuantity());
-                    CartItem cartItem = convertCartItemDTOToCartItem(cartItemExisting);
-
-                    cartItemRepository.save(cartItem);
-
-                    response.put("message", "Sản phẩm đã tồn tại trong giỏ hàng! Số lượng đã được cập nhật!");
-                    response.put("data", cartItemExisting);
-                    return ResponseEntity.ok(response);
-                }
-                // if product does not exist in cart, add new product to cart
-                CartItem cartItem = new CartItem();
-
-                ProductEntity productEntity = new ProductEntity();
-                productEntity.setId(productExisting.getId());
-
-                cartItem.setProduct(productEntity);
-
-                cartItem.setAccount(accountExisting);
-                cartItem.setQuantity(quantity);
-
-                cartItem = cartItemRepository.save(cartItem);
-
-                cartItemDTO = setCartItemDTO(cartItem, accountExisting.getUsername());
-
-                response.put("message", "Thêm sản phẩm vào giỏ hàng thành công!");
-                response.put("data", cartItemDTO);
-                return ResponseEntity.ok(response);
-
-            } else {
-                response.put("message", "Không tìm thấy sản phẩm");
-            }
-        } else {
+        if (accountExisting == null) {
             response.put("message", "Vui lòng đăng nhập trước khi thêm sản phẩm vào giỏ hàng!");
+            return ResponseEntity.badRequest().body(response);
         }
-        return ResponseEntity.badRequest().body(response);
+
+        Optional<ProductEntity> productExisting = productRepository.findById(productId);
+
+        if (!productExisting.isPresent()) {
+            response.put("message", "Không tìm thấy sản phẩm");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        ProductEntity product = productExisting.get();
+        CartItem cartItemExisting = cartItemRepository
+                .findByProductAndAccount(product.getId(), accountExisting.getUsername())
+                .orElse(null);
+
+        // if product already exists in cart, increase quantity
+        if (cartItemExisting != null) {
+            cartItemExisting.setQuantity(quantity + cartItemExisting.getQuantity());
+            cartItemRepository.save(cartItemExisting);
+
+            response.put("message", "Sản phẩm đã tồn tại trong giỏ hàng! Số lượng đã được cập nhật!");
+            response.put("data", cartItemExisting);
+
+            return ResponseEntity.ok(response);
+        }
+
+        // if product does not exist in cart, add new product to cart
+        CartItem cartItem = new CartItem();
+
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setId(product.getId());
+
+        cartItem.setProduct(productEntity);
+
+        cartItem.setAccount(accountExisting);
+        cartItem.setQuantity(quantity);
+
+        cartItem = cartItemRepository.save(cartItem);
+
+        CartItemDTO cartItemDTO = copyToCartItemDTO(cartItem);
+
+        response.put("message", "Thêm sản phẩm vào giỏ hàng thành công!");
+        response.put("data", cartItemDTO);
+
+        return ResponseEntity.ok(response);
+
     }
 
-    private CartItemDTO setCartItemDTO(CartItem cartItem, String username) {
+    private CartItemDTO copyToCartItemDTO(CartItem cartItem) {
         CartItemDTO cartItemDTO = new CartItemDTO();
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(cartItem.getProduct().getId());
-        productDTO.setName(cartItem.getProduct().getName());
-        productDTO.setPrice(cartItem.getProduct().getPrice());
-        cartItemDTO.setProduct(productDTO);
-
+        cartItemDTO.setId(cartItem.getId());
         cartItemDTO.setQuantity(cartItem.getQuantity());
-        cartItemDTO.setUsername(username);
+        cartItemDTO.setUsername(cartItem.getAccount().getUsername());
+        cartItemDTO.setProduct(copyProductToProductDTO(cartItem.getProduct()));
         return cartItemDTO;
     }
 
@@ -119,36 +119,43 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public ResponseEntity<?> getCartPages(Integer index, Integer size) {
+        Map<String, Object> response = new HashMap<>();
         AccountEntity accountExisting = getAccountFromRequest(request);
-        if (accountExisting != null) {
-            Pageable pageable = PageRequest.of(index, size);
-            Page<CartItemDTO> cartItems = cartItemRepository.findPagesByAccount(accountExisting.getUsername(), pageable);
-            if (cartItems != null) {
-                for (CartItemDTO cartItem : cartItems.getContent()) {
-                    Set<ImagesDTO> images = productRepository.findImagesDTOByProductID(cartItem.getProduct().getId());
-                    cartItem.getProduct().setImages(images);
-                }
-                return ResponseEntity.ok(cartItems);
-            }
+        if (accountExisting == null) {
+            response.put("message", "Vui lòng đăng nhập trước khi xem giỏ hàng!");
+            return ResponseEntity.badRequest().body(response);
         }
-        return ResponseEntity.badRequest().body("Không tìm thấy sản phẩm trong giỏ hàng!");
+
+        Pageable pageable = PageRequest.of(index, size);
+        Page<CartItem> cartItems = cartItemRepository.findPagesByAccount(accountExisting.getUsername(), pageable);
+        if (cartItems == null) {
+            response.put("message", "Không tìm thấy sản phẩm trong giỏ hàng!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Page<CartItemDTO> cartItemsDTO = cartItems.map(cartItem -> {
+            return copyToCartItemDTO(cartItem);
+        });
+
+        response.put("data", cartItemsDTO);
+        return ResponseEntity.ok(response);
     }
 
-    private CartItem convertCartItemDTOToCartItem(CartItemDTO cartItemDTO) {
-        CartItem cartItem = new CartItem();
-        cartItem.setId(cartItemDTO.getId());
-        cartItem.setQuantity(cartItemDTO.getQuantity());
+    private ProductDTO copyProductToProductDTO(ProductEntity product) {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(product.getId());
+        productDTO.setName(product.getName());
+        productDTO.setPrice(product.getPrice());
+        productDTO.setDescription(product.getDescription());
+        productDTO.setCategory(new CategoryDTO(product.getCategory().getId(), product.getCategory().getName()));
+        productDTO.setCreateDate(product.getCreateDate());
+        productDTO.setModifiDate(product.getModifiDate());
 
-        AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setUsername(cartItemDTO.getUsername());
+        Set<ImagesDTO> imagesDTO = productRepository.findImagesDTOByProductID(product.getId());
+        productDTO.setImages(imagesDTO);
+        ImagesDTO thumbnail = imagesDTO.iterator().next();
+        productDTO.setThumbnail(thumbnail);
 
-        cartItem.setAccount(accountRepository.findByUsernameLike(cartItemDTO.getUsername()).orElse(null));
-
-        ProductEntity product = new ProductEntity();
-        product.setId(cartItemDTO.getProduct().getId());
-        cartItem.setProduct(product);
-
-        return cartItem;
+        return productDTO;
     }
-
 }
