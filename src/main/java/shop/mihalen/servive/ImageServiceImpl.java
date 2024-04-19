@@ -35,5 +35,5 @@ public class ImageServiceImpl implements ImageService{
         headers.setContentLength(image.length);
         return new ResponseEntity<>(image, headers, HttpStatus.OK);
     }
-    
+
 }

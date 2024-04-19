@@ -26,6 +26,7 @@ import shop.mihalen.entity.ImageModel;
 import shop.mihalen.entity.ProductEntity;
 import shop.mihalen.repository.ImageRepository;
 import shop.mihalen.repository.ProductRepository;
+import shop.mihalen.utils.DtoUtils;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -35,6 +36,8 @@ public class ProductServiceImpl implements ProductService {
     private ImageService imageService;
     @Autowired
     private ImageRepository imageRepository;
+    @Autowired
+    private DtoUtils dtoUtils;
 
     @Override
     public ResponseEntity<?> addNewProduct(ProductEntity product) {
@@ -124,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
         Page<ProductEntity> products = productRepository.findAll(pageable);
 
         Page<ProductDTO> productsDTO = products.map(product -> {
-            return copyProductToProductDTO(product);
+            return dtoUtils.copyProductToProductDTO(product);
         });
 
         Map<String, Object> response = new HashMap<>();
@@ -165,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
             return ResponseEntity.badRequest().body(response);
         }
 
-        ProductDTO productDTO = copyProductToProductDTO(productExisting);
+        ProductDTO productDTO = dtoUtils.copyProductToProductDTO(productExisting);
 
         response.put("data", productDTO);
         response.put("message", "Product found");
@@ -225,7 +228,7 @@ public class ProductServiceImpl implements ProductService {
             product.getImages().addAll(images);
 
             productRepository.save(product);
-            ProductDTO productDTO = copyProductToProductDTO(product);
+            ProductDTO productDTO = dtoUtils.copyProductToProductDTO(product);
 
             response.put("data", productDTO);
             response.put("message", "Images updated successfully");
@@ -249,22 +252,5 @@ public class ProductServiceImpl implements ProductService {
         return images;
     }
 
-    private ProductDTO copyProductToProductDTO(ProductEntity product) {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(product.getId());
-        productDTO.setName(product.getName());
-        productDTO.setPrice(product.getPrice());
-        productDTO.setDescription(product.getDescription());
-        productDTO.setCategory(new CategoryDTO(product.getCategory().getId(), product.getCategory().getName()));
-        productDTO.setCreateDate(product.getCreateDate());
-        productDTO.setModifiDate(product.getModifiDate());
-
-        Set<ImagesDTO> imagesDTO = productRepository.findImagesDTOByProductID(product.getId());
-        productDTO.setImages(imagesDTO);
-        ImagesDTO thumbnail = imagesDTO.iterator().next();
-        productDTO.setThumbnail(thumbnail);
-
-        return productDTO;
-    }
 
 }

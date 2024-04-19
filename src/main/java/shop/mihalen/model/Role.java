@@ -1,6 +1,6 @@
 package shop.mihalen.model;
 
-import org.hibernate.mapping.List;
+import java.util.List;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,5 +10,5 @@ import lombok.Data;
 public class Role {
     private final String id;
     private final String name;
-    private final java.util.List<Account> accounts;
+    private final List<Account> accounts;
 }

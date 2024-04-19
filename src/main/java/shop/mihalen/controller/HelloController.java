@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HelloController {
     @GetMapping("/")
     public String getMethodName() {
-        return "Hello world";
+        return "Welcome to mihaLen Shop";
     }
 
     @GetMapping("/secured")

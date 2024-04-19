@@ -1,4 +1,4 @@
-package shop.mihalen.controller;
+package shop.mihalen.controller.admin;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/v1/admin/category")
 public class CategoryController {
     @Autowired
     CategoryService categoryService;
@@ -39,8 +39,29 @@ public class CategoryController {
             @RequestParam("size") Optional<Integer> size) {
         return categoryService.findAll(size.orElse(10), index.orElse(0));
     }
+
     @GetMapping("/all")
     public ResponseEntity<?> getMethodName() {
         return categoryService.findAll();
     }  
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> postMethodName(
+        @RequestPart("category") String categoryRequest,
+        @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnailRequest) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            CategoryEntity category = mapper.readValue(categoryRequest, CategoryEntity.class);
+
+            ImageModel thumbnail = new ImageModel(thumbnailRequest.getOriginalFilename(), thumbnailRequest.getContentType(),
+                    thumbnailRequest.getBytes());
+            category.setThumbnail(thumbnail);
+
+            return categoryService.create(category);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error: "+e.getMessage());
+        }
+    }
+    
 }

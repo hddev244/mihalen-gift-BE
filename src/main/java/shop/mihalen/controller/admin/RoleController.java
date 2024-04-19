@@ -1,4 +1,4 @@
-package shop.mihalen.controller;
+package shop.mihalen.controller.admin;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import shop.mihalen.servive.RoleService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/roles")
+@RequestMapping("/api/v1/admin/roles")
 public class RoleController {
     private final RoleService  roleService;
 
@@ -31,6 +31,7 @@ public class RoleController {
         Role role = roleService.findById(id);
         return ResponseEntity.ok(role);
     }
+    
     @PostMapping
     public ResponseEntity<Role> createRole(@RequestBody Role role){
         Role newRole = roleService.addNewRole(role);

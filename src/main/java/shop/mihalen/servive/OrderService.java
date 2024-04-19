@@ -9,5 +9,7 @@ public interface OrderService {
     ResponseEntity<?> addOrder(OrderRequest orderRequest);
 
     ResponseEntity<?> getAllOrdersOfCustomer();
+
+    ResponseEntity<?> getPageOrdersOfCustomer(Integer orElse, Integer orElse2);
     
 }

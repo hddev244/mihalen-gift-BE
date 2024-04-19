@@ -1,4 +1,4 @@
-package shop.mihalen.controller;
+package shop.mihalen.controller.admin;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/account/roles")
+@RequestMapping("/api/v1/admin/account/roles")
 public class RoleOfAccountController {
     private final RoleOfAccountService roleOfAccountService;
     @PostMapping

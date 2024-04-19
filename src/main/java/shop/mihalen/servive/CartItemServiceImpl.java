@@ -29,25 +29,31 @@ import shop.mihalen.repository.CartItemRepository;
 import shop.mihalen.repository.ProductRepository;
 import shop.mihalen.security.AccountPrincipal;
 import shop.mihalen.security.JwtUtils;
+import shop.mihalen.utils.AuthUtil;
+import shop.mihalen.utils.DtoUtils;
 
 @Service
 public class CartItemServiceImpl implements CartItemService {
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
     @Autowired
-    JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
     @Autowired
-    HttpServletRequest request;
+    private HttpServletRequest request;
     @Autowired
-    CartItemRepository cartItemRepository;
+    private CartItemRepository cartItemRepository;
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
+    @Autowired
+    private DtoUtils dtoUtils;
+    @Autowired
+    private AuthUtil authUtil;
 
     @Override
     public ResponseEntity<?> addToCart(Long productId, Integer quantity) {
         Map<String, Object> response = new HashMap<>();
 
-        AccountEntity accountExisting = getAccountFromRequest(request);
+        AccountEntity accountExisting = authUtil.getAccountFromRequest(request);
 
         if (accountExisting == null) {
             response.put("message", "Vui lòng đăng nhập trước khi thêm sản phẩm vào giỏ hàng!");
@@ -90,7 +96,7 @@ public class CartItemServiceImpl implements CartItemService {
 
         cartItem = cartItemRepository.save(cartItem);
 
-        CartItemDTO cartItemDTO = copyToCartItemDTO(cartItem);
+        CartItemDTO cartItemDTO = dtoUtils.copyToCartItemDTO(cartItem);
 
         response.put("message", "Thêm sản phẩm vào giỏ hàng thành công!");
         response.put("data", cartItemDTO);
@@ -99,28 +105,10 @@ public class CartItemServiceImpl implements CartItemService {
 
     }
 
-    private CartItemDTO copyToCartItemDTO(CartItem cartItem) {
-        CartItemDTO cartItemDTO = new CartItemDTO();
-        cartItemDTO.setId(cartItem.getId());
-        cartItemDTO.setQuantity(cartItem.getQuantity());
-        cartItemDTO.setUsername(cartItem.getAccount().getUsername());
-        cartItemDTO.setProduct(copyProductToProductDTO(cartItem.getProduct()));
-        return cartItemDTO;
-    }
-
-    private AccountEntity getAccountFromRequest(HttpServletRequest rq) {
-        AccountPrincipal accountPrincipal = jwtUtils.getAccountPrincipalFromToken(rq);
-        if (accountPrincipal != null) {
-            String username = accountPrincipal.getUsername();
-            return accountRepository.findByUsernameLike(username).orElse(null);
-        }
-        return null;
-    }
-
     @Override
     public ResponseEntity<?> getCartPages(Integer index, Integer size) {
         Map<String, Object> response = new HashMap<>();
-        AccountEntity accountExisting = getAccountFromRequest(request);
+        AccountEntity accountExisting = authUtil.getAccountFromRequest(request);
         if (accountExisting == null) {
             response.put("message", "Vui lòng đăng nhập trước khi xem giỏ hàng!");
             return ResponseEntity.badRequest().body(response);
@@ -134,28 +122,10 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         Page<CartItemDTO> cartItemsDTO = cartItems.map(cartItem -> {
-            return copyToCartItemDTO(cartItem);
+            return dtoUtils.copyToCartItemDTO(cartItem);
         });
 
         response.put("data", cartItemsDTO);
         return ResponseEntity.ok(response);
-    }
-
-    private ProductDTO copyProductToProductDTO(ProductEntity product) {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(product.getId());
-        productDTO.setName(product.getName());
-        productDTO.setPrice(product.getPrice());
-        productDTO.setDescription(product.getDescription());
-        productDTO.setCategory(new CategoryDTO(product.getCategory().getId(), product.getCategory().getName()));
-        productDTO.setCreateDate(product.getCreateDate());
-        productDTO.setModifiDate(product.getModifiDate());
-
-        Set<ImagesDTO> imagesDTO = productRepository.findImagesDTOByProductID(product.getId());
-        productDTO.setImages(imagesDTO);
-        ImagesDTO thumbnail = imagesDTO.iterator().next();
-        productDTO.setThumbnail(thumbnail);
-
-        return productDTO;
     }
 }

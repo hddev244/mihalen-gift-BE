@@ -28,6 +28,7 @@ import shop.mihalen.repository.AccountRepository;
 import shop.mihalen.repository.RoleRepository;
 import shop.mihalen.security.ChangePasswordRequest;
 
+
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {

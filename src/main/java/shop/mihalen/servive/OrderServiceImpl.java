@@ -16,7 +16,6 @@ import shop.mihalen.dto.CartItemDTO;
 import shop.mihalen.dto.OrderDTO;
 import shop.mihalen.dto.ProductDTO;
 import shop.mihalen.entity.AccountEntity;
-import shop.mihalen.entity.CartItem;
 import shop.mihalen.entity.Order;
 import shop.mihalen.entity.OrderDetail;
 import shop.mihalen.model.OrderRequest;
@@ -130,6 +129,7 @@ public class OrderServiceImpl implements OrderService{
 
         if (account != null) {
             List<Order> orders = orderRepository.findByAccount(account);
+
             List<OrderDTO> orderDTOs = new ArrayList<>();
             orders.forEach(order -> {
                 OrderDTO orderDTO = new OrderDTO();
@@ -138,10 +138,6 @@ public class OrderServiceImpl implements OrderService{
                 orderDTO.setAddress(order.getAddress());
                 orderDTO.setPhoneNumber(order.getPhoneNumber());
                 orderDTO.setOrderDate(order.getCreateDate());
-
-                List<OrderDetail> orderDetails = orderDetailRepository.findByOrder(order);
-
-                System.out.println(orderDetails.size() + " order details");
 
                 Set<CartItemDTO> cartItems = new HashSet<>();
                 order.getOrderDetails().forEach(orderDetail -> {
@@ -171,5 +167,11 @@ public class OrderServiceImpl implements OrderService{
             return ResponseEntity.badRequest().body(response);
         }
 
+    }
+
+    @Override
+    public ResponseEntity<?> getPageOrdersOfCustomer(Integer orElse, Integer orElse2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPageOrdersOfCustomer'");
     }
 }
