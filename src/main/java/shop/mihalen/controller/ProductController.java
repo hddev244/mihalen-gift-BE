@@ -65,35 +65,12 @@ public class ProductController {
     ){
         return productService.update(productUpdate);
     }
-
-    @PostMapping(value="/removeImage",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> removeImage(
-        @RequestPart("productId") String productIdS
-        ,@RequestPart("imageId") String imageIdS){
-            try{
-                Long productId = Long.parseLong(productIdS);
-                Long imageId = Long.parseLong(imageIdS);
-                return productService.removeImage(productId, imageId);
-            }catch(Exception e){
-                Map<String, Object> response = new HashMap<>();
-                response.put("message", "Error: "+e.getMessage());
-                System.out.println(e.getMessage());
-                return ResponseEntity.badRequest().body(response);
-            }
+    @GetMapping("/search")
+    public ResponseEntity<?> search(
+        @RequestParam("keyword") String keyword,
+        @RequestParam("index") Optional<Integer> index,
+        @RequestParam("size") Optional<Integer> size
+    ){
+        return productService.search(keyword, index.orElse(0), size.orElse(10));
     }
-    @PutMapping(value="/updateImages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateImages(
-        @RequestPart("productId") String productIdS,
-        @RequestPart(name="imageFile", required = false) MultipartFile[] files
-    )
-    {
-        return productService.updateImages(productIdS, files);
-    }
-
-
-    @GetMapping("/test")
-    public ResponseEntity<?> getMethodName() {
-        return productService.findAll();
-    }
-    
 }

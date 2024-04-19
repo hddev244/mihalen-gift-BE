@@ -52,5 +52,4 @@ public class AccountController {
         System.out.println(username);
     return ResponseEntity.ok(account);
     }
-
 }

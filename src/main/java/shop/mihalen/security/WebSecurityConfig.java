@@ -40,19 +40,24 @@ public class WebSecurityConfig {
                 .authorizeRequests(registry -> registry
                                 .requestMatchers(
                                         "/",
-                                        "/auth/register",
-                                        "/auth/login"
+                                        "/api/v1/auth/**"
                                         ).permitAll()
                                 .requestMatchers(
-                                        "/api/admin/**"
+                                        "/api/v1/account/**",
+                                        "/api/v1/order/**"
+                                        )
+                                        .hasAnyRole("USER","ADMIN","CUSTOMER")
+                                .requestMatchers(
+                                        "/api/v1/cart/**"
+                                        )
+                                        .hasAnyRole("USER","ADMIN")
+                                .requestMatchers(
+                                        "/api/v1/admin/**"
                                         )
                                         .hasAnyRole("ADMIN")
                                 .requestMatchers(
                                         "/**")
                                         .permitAll()
-                                .requestMatchers(
-                                        "/api/admin/categories/**"
-                                        ).permitAll()
                                 .anyRequest().authenticated()
                 )
             ;

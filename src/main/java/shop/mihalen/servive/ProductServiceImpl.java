@@ -12,14 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import shop.mihalen.dto.CategoryDTO;
-import shop.mihalen.dto.ImagesDTO;
 import shop.mihalen.dto.ProductDTO;
 import shop.mihalen.entity.CategoryEntity;
 import shop.mihalen.entity.ImageModel;
@@ -250,6 +247,12 @@ public class ProductServiceImpl implements ProductService {
             images.add(image);
         }
         return images;
+    }
+
+    @Override
+    public ResponseEntity<?> search(String keyword, Integer orElse, Integer orElse2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
     }
 
 

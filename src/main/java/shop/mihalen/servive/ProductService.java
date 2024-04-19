@@ -18,4 +18,5 @@ public interface ProductService {
     ResponseEntity<?> findByCategory(String id, int index, int size);
     ResponseEntity<?> updateImages(String productIdS, MultipartFile[] files);
     ResponseEntity<?> addNewProduct(String productString, MultipartFile[] files);
+    ResponseEntity<?> search(String keyword, Integer orElse, Integer orElse2);
 }
